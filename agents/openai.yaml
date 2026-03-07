@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeChat Cell Writer"
+  short_description: "Create compliant WeChat cell therapy article workflows"
+  default_prompt: "Use $wechat-cell-writer to research, draft, illustrate, validate, and prepare a compliant WeChat article about cell therapy."
