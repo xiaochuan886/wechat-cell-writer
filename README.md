@@ -1,5 +1,7 @@
 # wechat-cell-writer
 
+English | [简体中文](./README.zh-CN.md)
+
 `wechat-cell-writer` is a local skill for researching, drafting, illustrating, validating, and preparing WeChat Official Account articles about cell therapy and biomedical topics.
 
 ## What It Includes
