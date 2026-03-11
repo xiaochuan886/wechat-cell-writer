@@ -129,6 +129,11 @@ Practical health advice for readers.
 │    │   ├─ 配图1 (Type×Style) → imgs/figure-1.png             │
 │    │   ├─ 配图2 (Type×Style) → imgs/figure-2.png             │
 │    │   └─ 论文截图 → imgs/paper-*.png                         │
+│    ├─ Step 4.5: 引用图补充（自动执行）⚡ 见下方详细规则         │
+│    │   ├─ 调用 wechat-safe-science-images                    │
+│    │   ├─ 优先选择概念性图片（机制图、示意图）                   │
+│    │   ├─ 为每张图撰写融合性解释文字                           │
+│    │   └─ 输出到 imgs/refs/                                   │
 │    └─ ⚠️ 更新 article.md 插入所有图片引用                     │
 │                          ↓                                   │
 │  Step 5: Pre-Publish Checklist ⚠️ 必须执行                    │
@@ -260,26 +265,83 @@ node ~/.agents/skills/wechat-cell-writer/scripts/run-workflow.js \
 
 ## Step 4: Image Generation (3+张配图)
 
-### 4.5 引用图补充（合规优先，推荐）
+### 4.5 引用图补充（自动执行）⚡
 
-在 Cell Writer 的“自制图”之外，可以补充 1-3 张**引用科普图**来提升质感（例如：显微图、机制示意图）。
+**此步骤在生成自制图后自动执行**，补充 1-2 张高质量引用图来增强文章的专业感和可信度。
 
-使用配套 skill：`wechat-safe-science-images`
-- 来源白名单：默认仅 Wikimedia Commons
-- 许可闸门：只允许 Public Domain/CC0/CC BY/CC BY-SA，拒绝 NC/ND/未知
-- 输出：下载到 `imgs/refs/` + `image-manifest.json` + `image-credits.md`
+#### 图片选择优先级
 
-工作流命令（建议在写完 article.md 初稿后执行）：
-```bash
-node ~/.agents/skills/wechat-cell-writer/scripts/run-workflow.js \
-  --step fetch-ref-images --dir "$ARTICLE_DIR" --limit 3
+| 优先级 | 图片类型 | 说明 | 搜索关键词示例 |
+|--------|----------|------|----------------|
+| ⭐⭐⭐ | **概念机制图** | 解释原理、流程、相互作用 | “mechanism diagram”, “pathway diagram” |
+| ⭐⭐⭐ | **结构示意图** | 展示细胞/分子结构 | “cell structure diagram”, “anatomy diagram” |
+| ⭐⭐ | **对比图** | 前后对比、类型对比 | “comparison diagram”, “vs diagram” |
+| ⭐ | **显微图/真实图** | 真实感、权威感 | “micrograph”, “electron microscopy” |
+
+**⛔ 禁止选择**：
+- 纯装饰性图片
+- 与文章主题关联度低的图片
+- 需要大量背景知识才能理解的图片
+
+#### 内容融合规则（必须遵守）
+
+引用图**不能生硬插入**，必须与文章内容自然融合：
+
+**1. 位置选择**
+- 图片应紧跟相关段落后
+- 不应在文章开头或结尾孤立放置
+- 不应打断重要论述的逻辑链条
+
+**2. 解释文字要求**
+
+每张引用图必须配有**融合性解释文字**，格式如下：
+
+```markdown
+![NK细胞识别肿瘤细胞的过程](imgs/refs/nk-cell-mechanism.png)
+*上图展示了NK细胞如何识别并攻击肿瘤细胞。当NK细胞表面的受体识别到异常细胞时，会释放穿孔素和颗粒酶，诱导目标细胞凋亡。*
 ```
 
-署名策略（按你的要求，默认启用 A，并按最新约定更新）：
-- **对读者的披露**：在每张引用图下方追加一句简短说明（不带 URL），例如：
-  - `*图源：Wikimedia Commons（公开许可素材，CC BY）。*`
-- **内部留档**：完整来源/许可证据链写入 `imgs/refs/image-manifest.json`（可含 URL），不放正文。
-- 不再在正文末尾添加“图片来源与授权/图片素材摘要”等大段区块（避免对读者无意义的信息）。
+**解释文字三要素**：
+- ✅ **承接上文**：用”上图展示了...”、”正如我们所见...”等连接
+- ✅ **解释图片**：说明图片中的关键信息
+- ✅ **呼应主题**：与文章核心观点建立联系
+
+**3. 禁止的生硬插入方式**
+
+```markdown
+❌ 错误示例（生硬）：
+NK细胞很重要。
+
+![NK细胞](imgs/refs/nk-cell.png)
+
+接下来我们讲T细胞...
+
+✅ 正确示例（融合）：
+NK细胞是我们免疫系统的”第一道防线”。当正常细胞发生癌变时，NK细胞能够快速识别并清除它们。
+
+![NK细胞识别并攻击肿瘤细胞的过程](imgs/refs/nk-cell-mechanism.png)
+*上图展示了NK细胞的杀伤机制：通过释放穿孔素在目标细胞膜上打孔，随后注入颗粒酶诱导细胞凋亡。*
+
+这种”先识别、后杀伤”的机制，让NK细胞成为对抗癌症的重要武器...
+```
+
+#### 工作流命令
+
+```bash
+# 自动执行（在 Step 4.4 完成后）
+node ~/.agents/skills/wechat-cell-writer/scripts/run-workflow.js \
+  --step fetch-ref-images --dir “$ARTICLE_DIR” --limit 2
+```
+
+#### 输出与署名
+
+- 输出目录：`imgs/refs/`
+- 内部审计：`imgs/refs/image-manifest.json`（含完整来源/许可信息）
+- 读者可见：图片下方简短署名（不含 URL）
+
+```markdown
+*图源：Wikimedia Commons（CC BY 4.0）。*
+```
 
 
 ### ⚠️ 重要：生成图片前必须阅读详细指南
