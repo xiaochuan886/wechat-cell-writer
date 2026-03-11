@@ -265,83 +265,27 @@ node ~/.agents/skills/wechat-cell-writer/scripts/run-workflow.js \
 
 ## Step 4: Image Generation (3+张配图)
 
-### 4.5 引用图补充（自动执行）⚡
+### 4.5 引用图补充（自动执行）
 
-**此步骤在生成自制图后自动执行**，补充 1-2 张高质量引用图来增强文章的专业感和可信度。
+生成自制图后，自动补充 1-2 张引用图来增强专业感。调用 `wechat-safe-science-images` skill。
 
-#### 图片选择优先级
+**核心原则**：
+- 优先选择**概念性图片**（机制图、示意图），这类图片能帮助读者理解复杂概念
+- 图片必须与内容**自然融合**，不能生硬插入
+- 每张图需要解释文字：承接上文 + 解释图片 + 呼应主题
 
-| 优先级 | 图片类型 | 说明 | 搜索关键词示例 |
-|--------|----------|------|----------------|
-| ⭐⭐⭐ | **概念机制图** | 解释原理、流程、相互作用 | “mechanism diagram”, “pathway diagram” |
-| ⭐⭐⭐ | **结构示意图** | 展示细胞/分子结构 | “cell structure diagram”, “anatomy diagram” |
-| ⭐⭐ | **对比图** | 前后对比、类型对比 | “comparison diagram”, “vs diagram” |
-| ⭐ | **显微图/真实图** | 真实感、权威感 | “micrograph”, “electron microscopy” |
+详细规则和示例见 [references/reference-image-guide.md](references/reference-image-guide.md)。
 
-**⛔ 禁止选择**：
-- 纯装饰性图片
-- 与文章主题关联度低的图片
-- 需要大量背景知识才能理解的图片
-
-#### 内容融合规则（必须遵守）
-
-引用图**不能生硬插入**，必须与文章内容自然融合：
-
-**1. 位置选择**
-- 图片应紧跟相关段落后
-- 不应在文章开头或结尾孤立放置
-- 不应打断重要论述的逻辑链条
-
-**2. 解释文字要求**
-
-每张引用图必须配有**融合性解释文字**，格式如下：
-
-```markdown
-![NK细胞识别肿瘤细胞的过程](imgs/refs/nk-cell-mechanism.png)
-*上图展示了NK细胞如何识别并攻击肿瘤细胞。当NK细胞表面的受体识别到异常细胞时，会释放穿孔素和颗粒酶，诱导目标细胞凋亡。*
-```
-
-**解释文字三要素**：
-- ✅ **承接上文**：用”上图展示了...”、”正如我们所见...”等连接
-- ✅ **解释图片**：说明图片中的关键信息
-- ✅ **呼应主题**：与文章核心观点建立联系
-
-**3. 禁止的生硬插入方式**
-
-```markdown
-❌ 错误示例（生硬）：
-NK细胞很重要。
-
-![NK细胞](imgs/refs/nk-cell.png)
-
-接下来我们讲T细胞...
-
-✅ 正确示例（融合）：
-NK细胞是我们免疫系统的”第一道防线”。当正常细胞发生癌变时，NK细胞能够快速识别并清除它们。
-
-![NK细胞识别并攻击肿瘤细胞的过程](imgs/refs/nk-cell-mechanism.png)
-*上图展示了NK细胞的杀伤机制：通过释放穿孔素在目标细胞膜上打孔，随后注入颗粒酶诱导细胞凋亡。*
-
-这种”先识别、后杀伤”的机制，让NK细胞成为对抗癌症的重要武器...
-```
-
-#### 工作流命令
-
+**执行命令**：
 ```bash
-# 自动执行（在 Step 4.4 完成后）
 node ~/.agents/skills/wechat-cell-writer/scripts/run-workflow.js \
   --step fetch-ref-images --dir “$ARTICLE_DIR” --limit 2
 ```
 
-#### 输出与署名
-
-- 输出目录：`imgs/refs/`
-- 内部审计：`imgs/refs/image-manifest.json`（含完整来源/许可信息）
-- 读者可见：图片下方简短署名（不含 URL）
-
-```markdown
-*图源：Wikimedia Commons（CC BY 4.0）。*
-```
+**输出**：
+- 图片目录：`imgs/refs/`
+- 审计文件：`imgs/refs/image-manifest.json`
+- 署名格式：`*图源：Wikimedia Commons（CC BY 4.0）。*`
 
 
 ### ⚠️ 重要：生成图片前必须阅读详细指南
